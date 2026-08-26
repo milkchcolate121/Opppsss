@@ -5,7 +5,7 @@ http {
     server {
         listen ${NGINX_PORT};
 
-        # مدیریت پنل وب
+        # مسیر مدیریت پنل وب
         location /managepanel/ {
             proxy_pass http://127.0.0.1:2053/managepanel/;
             proxy_http_version 1.1;
@@ -17,7 +17,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # ساب‌اسکریپشن (مستقیماً روی همان پورت ۲۰۵۳ پنل)
+        # مسیر ساب‌اسکریپشن (ارسال مستقیم به پورت اصلی پنل)
         location /sub/ {
             proxy_pass http://127.0.0.1:2053/sub/;
             proxy_http_version 1.1;
@@ -27,7 +27,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # ترافیک اینباندها
+        # ترافیک اینباندها (VLESS / WebSocket)
         location / {
             proxy_pass http://127.0.0.1:8080;
             proxy_http_version 1.1;
