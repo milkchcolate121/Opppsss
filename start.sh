@@ -3,20 +3,25 @@ set -e
 
 echo "🚀 Starting X-UI + nginx reverse proxy..."
 
-# nginx همیشه روی پورت ثابت 3000 گوش می‌دهد
 export NGINX_PORT=3000
 
 cd /usr/local/x-ui
 
-echo "🔧 Applying panel settings via x-ui CLI..."
+echo "🔧 Applying panel settings via x-ui CLI & SQLite..."
 ./x-ui setting -port 2053 -webBasePath /managepanel/ || true
+
+# تنظیم پورت و مسیر ساب‌اسکریپشن در دیتابیس
+if [ -f /etc/x-ui/x-ui.db ]; then
+    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = '2096' WHERE key = 'subPort';" || true
+    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = '/sub/' WHERE key = 'subPath';" || true
+    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = 'true' WHERE key = 'subEnable';" || true
+fi
 
 echo "🔧 Building nginx.conf for fixed port: $NGINX_PORT"
 envsubst '${NGINX_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 echo "▶️  Starting x-ui in background..."
 ./x-ui &
-X_UI_PID=$!
 
 sleep 2
 
