@@ -5,7 +5,7 @@ http {
     server {
         listen ${NGINX_PORT};
 
-        # مسیر پنل وب
+        # مدیریت پنل وب
         location /managepanel/ {
             proxy_pass http://127.0.0.1:2053/managepanel/;
             proxy_http_version 1.1;
@@ -17,9 +17,9 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # مسیر Subscription (اصلاح‌شده: بدون اسلش پایانی در proxy_pass)
+        # ساب‌اسکریپشن (مستقیماً روی همان پورت ۲۰۵۳ پنل)
         location /sub/ {
-            proxy_pass http://127.0.0.1:2096;
+            proxy_pass http://127.0.0.1:2053/sub/;
             proxy_http_version 1.1;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -27,7 +27,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # سایر مسیرها (اینباند VLESS / WebSocket)
+        # ترافیک اینباندها
         location / {
             proxy_pass http://127.0.0.1:8080;
             proxy_http_version 1.1;
