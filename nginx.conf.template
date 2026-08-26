@@ -5,7 +5,7 @@ http {
     server {
         listen ${NGINX_PORT};
 
-        # مسیر پنل وب (فوروارد به پورت داخلی 2053 که x-ui روش گوش می‌ده)
+        # مسیر پنل وب
         location /managepanel/ {
             proxy_pass http://127.0.0.1:2053/managepanel/;
             proxy_http_version 1.1;
@@ -17,9 +17,9 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # مسیر Subscription (ساب لینک) - فوروارد به پورت داخلی 2096
+        # مسیر Subscription (ساب لینک) - ارسال به پورت 2053 پنل
         location /sub/ {
-            proxy_pass http://127.0.0.1:2096/sub/;
+            proxy_pass http://127.0.0.1:2053/sub/;
             proxy_http_version 1.1;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -27,7 +27,7 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # هر مسیر دیگه (اینباند VLESS/WebSocket) به پورت داخلی 8080
+        # اینباند VLESS / WebSocket
         location / {
             proxy_pass http://127.0.0.1:8080;
             proxy_http_version 1.1;
