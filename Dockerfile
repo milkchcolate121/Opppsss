@@ -11,7 +11,7 @@ RUN apk add --no-cache \
     gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Tehran /etc/localtime
 
-# دانلود و نصب 3x-ui
+# دانلود و نصب 3x-ui نسخه v3.7.0 (نسخه‌ای که ساب‌لینک آن سالم کار می‌کند)
 RUN curl -L https://github.com/mhsanaei/3x-ui/releases/download/v3.6.0/x-ui-linux-amd64.tar.gz -o /tmp/x-ui.tar.gz \
     && tar -xzf /tmp/x-ui.tar.gz -C /usr/local/ \
     && rm /tmp/x-ui.tar.gz \
