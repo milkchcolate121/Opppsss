@@ -3,7 +3,7 @@ set -e
 
 echo "🚀 Starting X-UI + nginx reverse proxy..."
 
-export NGINX_PORT=2053
+export NGINX_PORT=3000
 
 cd /usr/local/x-ui
 
