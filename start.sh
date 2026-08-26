@@ -7,24 +7,31 @@ export NGINX_PORT=3000
 
 cd /usr/local/x-ui
 
-echo "🔧 Applying panel settings via x-ui CLI & SQLite..."
+echo "🔧 Applying initial CLI settings..."
 ./x-ui setting -port 2053 -webBasePath /managepanel/ || true
 
-# تنظیم پورت و مسیر ساب‌اسکریپشن در دیتابیس
+echo "▶️  Starting x-ui background process to initialize DB..."
+./x-ui &
+XUI_PID=$!
+
+# ۳ ثانیه صبر می‌کنیم تا فایل دیتابیس ساخته شود
+sleep 3
+
+echo "🔧 Injecting Subscription settings into SQLite database..."
 if [ -f /etc/x-ui/x-ui.db ]; then
-    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = '2096' WHERE key = 'subPort';" || true
-    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = '/sub/' WHERE key = 'subPath';" || true
-    sqlite3 /etc/x-ui/x-ui.db "UPDATE settings SET value = 'true' WHERE key = 'subEnable';" || true
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('subPort', '2096');"
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('subPath', '/sub/');"
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('subEnable', 'true');"
 fi
 
-echo "🔧 Building nginx.conf for fixed port: $NGINX_PORT"
-envsubst '${NGINX_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
-
-echo "▶️  Starting x-ui in background..."
+# ری‌استارت پنل برای اعمال تنظیمات جدید دیتابیس
+kill $XUI_PID || true
+sleep 1
 ./x-ui &
 
-sleep 2
+echo "🔧 Building nginx.conf..."
+envsubst '${NGINX_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
-echo "▶️  Starting nginx in foreground on port $NGINX_PORT..."
+echo "▶️  Starting nginx..."
 nginx -t
 exec nginx -g "daemon off;"
